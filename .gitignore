@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+
+# Local config and secrets
+config.local.json
+.env
+*.key
+
+# Input PDFs and generated outputs
+pdfs/
+output/
+logs/
+archive/
+cards_input/
+
+# Temporary files
+*.tmp
+*.bak
+~$*
+.DS_Store
+
+# Generated documents
+*.docx
+*.xlsx
+*.csv
+*.log
