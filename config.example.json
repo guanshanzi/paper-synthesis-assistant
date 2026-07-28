@@ -1,0 +1,18 @@
+{
+  "base_url": "https://api.302.ai/v1",
+  "api_key": "",
+  "card_model": "gpt-5.4",
+  "write_model": "gpt-5.4",
+  "review_model": "gpt-5.5",
+  "pdf_dir": "pdfs",
+  "output_dir": "output",
+  "title": "",
+  "card_prompt": "",
+  "requirements": "",
+  "risk_phrases": "必然导致\n必然提高\n必然解决\n直接证明\n完全解决\n毫无疑问",
+  "min_total_count": 3000,
+  "max_total_count": 8000,
+  "min_references": 2,
+  "max_references": 8,
+  "max_retries": 5
+}
