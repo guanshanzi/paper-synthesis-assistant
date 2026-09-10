@@ -16,7 +16,7 @@ import os
 # 一、API 与模型配置
 # =========================================================
 
-API_KEY = os.getenv("API_KEY") or os.getenv("OPENAI_API_KEY") or "请在界面填写API_KEY"
+API_KEY = os.getenv("API_KEY") or os.getenv("OPENAI_API_KEY") or ""
 BASE_URL = os.getenv("BASE_URL") or os.getenv("OPENAI_BASE_URL") or "https://api.302.ai/v1"
 MODEL = os.getenv("CARD_MODEL") or os.getenv("WRITE_MODEL") or "gpt-5.4"
 SLEEP_SECONDS = 2
@@ -419,8 +419,8 @@ def append_matrix_csv(ref_num, data):
 # =========================================================
 
 def main():
-    if "在这里" in API_KEY or not API_KEY.strip():
-        print("请先在代码顶部填写 API_KEY。")
+    if not API_KEY.strip():
+        print("API Key 未配置。请打开论文自动综合助手，在“API 与模型”区域填写 Base URL、API Key 和模型名称后保存配置。")
         sys.exit(1)
 
     if not CARDS_DIR.exists():

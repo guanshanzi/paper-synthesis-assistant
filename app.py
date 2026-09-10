@@ -205,6 +205,12 @@ class App:
             foreground="#4B5563"
         ).pack(side="left", padx=16)
 
+        ttk.Button(
+            header,
+            text="使用说明",
+            command=self.show_usage_help
+        ).pack(side="right")
+
         # 顶部：文件夹和 API
         top = ttk.Frame(main)
         top.pack(fill="x")
@@ -228,12 +234,20 @@ class App:
         self.review_model_var = tk.StringVar(value=self.config.get("review_model", "gpt-5.5"))
         self.max_retries_var = tk.StringVar(value=str(self.config.get("max_retries", 3)))
 
-        self.add_labeled_entry(right_top, "Base URL", self.base_url_var, 0, 0, width=38)
-        self.add_labeled_entry(right_top, "API Key", self.api_key_var, 1, 0, width=38, show="*")
+        self.add_labeled_entry(right_top, "Base URL（可修改）", self.base_url_var, 0, 0, width=38)
+        self.add_labeled_entry(right_top, "API Key（可修改）", self.api_key_var, 1, 0, width=38, show="*")
         self.add_labeled_entry(right_top, "资料卡片模型", self.card_model_var, 2, 0, width=18)
         self.add_labeled_entry(right_top, "写作模型", self.write_model_var, 2, 2, width=18)
         self.add_labeled_entry(right_top, "审稿模型", self.review_model_var, 3, 0, width=18)
         self.add_labeled_entry(right_top, "重试次数", self.max_retries_var, 3, 2, width=8)
+
+        api_hint = "Base URL、API Key 和模型都可直接修改；更换 API/中转站无需改代码。"
+        ttk.Label(
+            right_top, text=api_hint, foreground="#6B7280", wraplength=620, justify="left"
+        ).grid(row=4, column=0, columnspan=4, sticky="w", padx=8, pady=(2, 4))
+        ttk.Button(right_top, text="API 怎么填？", command=self.show_api_help).grid(
+            row=5, column=0, columnspan=2, sticky="w", padx=8, pady=(0, 7)
+        )
 
         # Notebook
         notebook = ttk.Notebook(main)
@@ -268,6 +282,33 @@ class App:
         ttk.Button(actions, text="正式模式", command=self.apply_formal_mode).pack(side="left", padx=4)
         ttk.Button(actions, text="新建任务/归档清空", command=self.archive_current_task).pack(side="left", padx=4)
 
+    def show_usage_help(self):
+        messagebox.showinfo(
+            "使用说明",
+            "论文自动综合助手会把综述写作中的重复整理步骤串成一条本地工作流。\n\n"
+            "流程：PDF → 资料卡片 → 证据矩阵 → 按大纲写作 → 引文/参考文献修复 → 字数与最终检查。\n\n"
+            "开始使用：\n"
+            "1. 把 PDF 放入 PDF 文件夹；\n"
+            "2. 在“API 与模型”中填写或修改 Base URL、API Key 和模型；\n"
+            "3. 填写论文题目、写作要求和大纲；\n"
+            "4. 保存配置并点击“开始全流程”。\n\n"
+            "API 地址、密钥和模型都可以直接在界面修改，不需要改代码。"
+        )
+
+    def show_api_help(self):
+        messagebox.showinfo(
+            "API 设置说明",
+            "本软件通过 OpenAI-compatible API 调用模型。\n\n"
+            "1. Base URL：填写你的 API 服务商/中转站提供的接口地址。\n"
+            "   当前默认地址只是示例；换服务商时直接覆盖即可。\n\n"
+            "2. API Key：填写该服务商生成的 API 密钥。\n\n"
+            "3. 模型名称：填写该服务商实际支持的模型 ID。\n"
+            "   资料卡片、写作、审稿三个位置可以填同一个模型，也可以分别填写。\n\n"
+            "更换 API/中转站的最简单方法：\n"
+            "修改 Base URL → 修改 API Key → 修改模型名称 → 点击“保存配置”。\n\n"
+            "如果不知道具体 Base URL 或模型 ID，请查看你所使用 API 服务商的接口文档。"
+        )
+
     def add_path_row(self, parent, label, var, choose_cmd, open_cmd, row):
         ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", padx=8, pady=6)
         ttk.Entry(parent, textvariable=var, width=66).grid(row=row, column=1, sticky="we", padx=4, pady=6)
@@ -290,7 +331,7 @@ class App:
 
         hint = (
             "建议：第一次测试只放 2—3 篇 PDF；正式跑几百篇前，先确认每一阶段脚本都能通过。"
-            "API Key 只保存在本地 config.local.json，不要上传或发给别人。"
+            "如需更换 API/中转站，请直接修改上方 Base URL、API Key 和模型名称。"
         )
         ttk.Label(frame, text=hint, foreground="#6B7280", wraplength=1000).pack(anchor="w", padx=8, pady=8)
 
@@ -501,7 +542,7 @@ class App:
             self.log("提醒：API Key 为空。可以先保存配置，但开始全流程前需要填写。")
 
         save_config(config)
-        self.log("配置已保存。config.local.json 含 API Key，不要上传。")
+        self.log("配置已保存。")
 
     def log(self, msg):
         self.log_text.insert("end", msg + "\n")
