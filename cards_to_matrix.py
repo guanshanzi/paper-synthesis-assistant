@@ -13,13 +13,21 @@ import os
 
 
 # =========================================================
-# 一、填写你的 302.AI 信息
+# 一、API 与模型配置
 # =========================================================
 
 API_KEY = os.getenv("API_KEY") or os.getenv("OPENAI_API_KEY") or "请在界面填写API_KEY"
 BASE_URL = os.getenv("BASE_URL") or os.getenv("OPENAI_BASE_URL") or "https://api.302.ai/v1"
 MODEL = os.getenv("CARD_MODEL") or os.getenv("WRITE_MODEL") or "gpt-5.4"
 SLEEP_SECONDS = 2
+
+PAPER_TITLE = (os.getenv("PAPER_TITLE") or "").strip()
+if not PAPER_TITLE:
+    title_file = Path(__file__).parent / "论文题目.txt"
+    if title_file.exists():
+        PAPER_TITLE = title_file.read_text(encoding="utf-8", errors="replace").strip()
+if not PAPER_TITLE:
+    PAPER_TITLE = "未填写论文题目"
 
 
 # =========================================================
@@ -304,7 +312,7 @@ def summarize_card_to_matrix(title, content):
     prompt = f"""
 你正在帮助我整理已有的论文资料卡片。注意：这不是重新总结论文原文，而是把“已有资料卡片”压缩成可用于综述写作的证据矩阵。
 
-我的论文主题是：《防止耕地非粮化背景下中药材种植业的发展困境与对策研究》。
+我的论文主题是：《{PAPER_TITLE}》。
 
 请根据下面这张资料卡片，提取其对我论文写作最有用的信息。
 
@@ -317,7 +325,7 @@ def summarize_card_to_matrix(title, content):
   "source": "期刊或来源，若没有则留空",
   "relevance_score": "0-5分",
   "priority": "核心/重要/一般/背景/不建议使用",
-  "chapter": "适合放入的章节，可多选：政策背景；土地资源约束；中药材种植空间；林下种植；荒坡地利用；间作轮作；质量与产量稳定性；种植成本；农户积极性；产业链协同；政策扶持；标准化与技术支持；生态风险；其他",
+  "chapter": "适合放入论文的章节或部分，可多选；请根据当前论文题目与资料卡片内容概括，不要套用旧项目的固定分类",
   "problem_supported": "这篇文献能支撑的困境，不超过120字",
   "countermeasure_supported": "这篇文献能支撑的对策，不超过120字",
   "core_view": "最核心观点，不超过150字",

@@ -9,10 +9,14 @@
   "title": "",
   "card_prompt": "",
   "requirements": "",
-  "risk_phrases": "必然导致\n必然提高\n必然解决\n直接证明\n完全解决\n毫无疑问",
-  "min_total_count": 3000,
-  "max_total_count": 8000,
-  "min_references": 2,
-  "max_references": 8,
-  "max_retries": 5
+  "risk_phrases": "直接导致\\n必然\\n完全解决\\n显著证明\\n决定性证明\\n毫无疑问\\n众所周知",
+  "min_total_count": 7500,
+  "max_total_count": 8500,
+  "min_references": 30,
+  "max_references": 35,
+  "min_year": 2021,
+  "heading_style": "1 / 1.1",
+  "forbid_third_heading": true,
+  "require_reference_order": true,
+  "max_retries": 3
 }

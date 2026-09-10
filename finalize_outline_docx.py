@@ -414,7 +414,7 @@ def write_report(result, headings):
     lines = []
     lines.append("硬约束检查报告_v3")
     lines.append("=" * 50)
-    lines.append("模式：MVP 1.4 界面大纲驱动")
+    lines.append("模式：v1.0.0 大纲驱动写作工作流")
     lines.append("")
     lines.append("一、识别到的写作大纲")
     for h in headings:
@@ -442,7 +442,7 @@ def write_audit_stub(result):
     doc = Document()
     set_doc_style(doc)
     add_heading(doc, "全方位审稿评分报告", 0)
-    add_para(doc, "本报告由 MVP 1.4 大纲驱动流程生成。")
+    add_para(doc, "本报告由论文自动综合助手 v1.0.0 大纲驱动流程生成。")
     add_para(doc, f"全文统计：{result['total']}")
     add_para(doc, f"参考文献数量：{result['ref_count']}")
     add_para(doc, "后续可接入独立审稿模型，对结构、论证、证据、语言和AI感进行细评。")
@@ -451,14 +451,14 @@ def write_audit_stub(result):
 
 
 # =========================================================
-# MVP 1.4 引文与参考文献兜底修复
+# 引文与参考文献兜底修复
 # =========================================================
 
-def _mvp14_doc_has_cites(text):
+def _fallback_doc_has_cites(text):
     return bool(re.search(r"\[[0-9,\-—，、\s]+\]", text))
 
 
-def _mvp14_para_is_heading(p):
+def _fallback_para_is_heading(p):
     t = p.text.strip()
     if not t:
         return False
@@ -469,7 +469,7 @@ def _mvp14_para_is_heading(p):
     return False
 
 
-def _mvp14_remove_reference_section(doc):
+def _fallback_remove_reference_section(doc):
     paras = doc.paragraphs
     start_idx = None
     for i, p in enumerate(paras):
@@ -485,7 +485,7 @@ def _mvp14_remove_reference_section(doc):
             parent.remove(element)
 
 
-def _mvp14_fix_docx_refs_and_cites(path, refs):
+def _fallback_fix_docx_refs_and_cites(path, refs):
     """
     保存后兜底修复：
     1. 如果正文没有任何引文，则按段落补入 [1] [2]；
@@ -507,13 +507,13 @@ def _mvp14_fix_docx_refs_and_cites(path, refs):
             continue
         if in_refs:
             continue
-        if not t or _mvp14_para_is_heading(p) or len(t) < 40:
+        if not t or _fallback_para_is_heading(p) or len(t) < 40:
             continue
         body_paras.append(p)
 
     body_text = "\n".join(p.text for p in body_paras)
 
-    if not _mvp14_doc_has_cites(body_text):
+    if not _fallback_doc_has_cites(body_text):
         n = 1
         for p in body_paras:
             p.add_run(f"[{n}]")
@@ -525,7 +525,7 @@ def _mvp14_fix_docx_refs_and_cites(path, refs):
             if n > len(refs):
                 n = 1
 
-    _mvp14_remove_reference_section(doc)
+    _fallback_remove_reference_section(doc)
 
     p = doc.add_heading("参考文献", level=1)
     for run in p.runs:
@@ -567,7 +567,7 @@ def main():
 
         result = validate_text(sections, refs)
         write_docx(sections, refs)
-        _mvp14_fix_docx_refs_and_cites(OUTPUT_DOCX, refs)
+        _fallback_fix_docx_refs_and_cites(OUTPUT_DOCX, refs)
         write_report(result, headings)
         write_audit_stub(result)
 

@@ -249,8 +249,8 @@ def main():
         (BASE_DIR / "cards_input").mkdir(exist_ok=True)
         (BASE_DIR / "logs").mkdir(exist_ok=True)
 
-        log("本地综述论文自动写作流程启动。")
-        log("当前流程：MVP 1.4 界面大纲驱动版")
+        log("论文自动综合助手流程启动。")
+        log("当前流程：v1.0.0 大纲驱动写作工作流")
         log(f"项目目录：{BASE_DIR}")
         log(f"PDF目录：{pdf_dir}")
         log(f"输出目录：{output_dir}")
