@@ -250,7 +250,7 @@ def main():
         (BASE_DIR / "logs").mkdir(exist_ok=True)
 
         log("论文自动综合助手流程启动。")
-        log("当前流程：v1.0.0 大纲驱动写作工作流")
+        log("当前流程：v1.0.1 大纲驱动写作工作流")
         log(f"项目目录：{BASE_DIR}")
         log(f"PDF目录：{pdf_dir}")
         log(f"输出目录：{output_dir}")

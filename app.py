@@ -138,7 +138,7 @@ def save_config(config):
 class App:
     def __init__(self, root):
         self.root = root
-        self.root.title("论文自动综合助手 v1.0.0")
+        self.root.title("论文自动综合助手 v1.0.1")
         self.root.geometry("1600x980")
         self.root.minsize(1450, 850)
         try:

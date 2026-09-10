@@ -109,7 +109,7 @@ function Install-LocalPython {
 }
 
 try {
-    Log "论文自动综合助手 v1.0.0 启动。"
+    Log "论文自动综合助手 v1.0.1 启动。"
 
     foreach ($dir in @("pdfs", "output", "logs", "cards_input", "archive")) {
         New-Item -ItemType Directory -Force -Path (Join-Path $Root $dir) | Out-Null
@@ -137,8 +137,12 @@ try {
 
     if (-not (Test-Path $VenvPython)) {
         Log "首次配置：正在创建独立虚拟环境 .venv ..."
+        $oldErrorAction = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
         & $basePython -m venv $VenvDir 2>&1 | Tee-Object -FilePath $LogFile -Append
-        if ($LASTEXITCODE -ne 0 -or -not (Test-Path $VenvPython)) {
+        $venvExit = $LASTEXITCODE
+        $ErrorActionPreference = $oldErrorAction
+        if ($venvExit -ne 0 -or -not (Test-Path $VenvPython)) {
             throw "创建虚拟环境失败。"
         }
     }
@@ -147,13 +151,20 @@ try {
     $savedHash = if (Test-Path $StampFile) { (Get-Content $StampFile -Raw).Trim() } else { "" }
 
     if ($Repair -or $currentHash -ne $savedHash) {
-        Log "正在安装/更新运行依赖，首次运行可能需要几分钟..."
+        Log "正在安装运行依赖，首次运行可能需要几分钟..."
         $env:PIP_DISABLE_PIP_VERSION_CHECK = "1"
-        & $VenvPython -m pip install --upgrade pip 2>&1 | Tee-Object -FilePath $LogFile -Append
-        if ($LASTEXITCODE -ne 0) { throw "pip 更新失败。" }
+        $env:PIP_NO_CACHE_DIR = "1"
 
-        & $VenvPython -m pip install -r $ReqFile 2>&1 | Tee-Object -FilePath $LogFile -Append
-        if ($LASTEXITCODE -ne 0) { throw "Python 依赖安装失败。" }
+        # pip sometimes writes harmless WARNING lines to stderr.
+        # Windows PowerShell can turn those lines into ErrorRecord objects when 2>&1 is used.
+        # Temporarily keep native stderr non-terminating and judge success only by the process exit code.
+        $oldErrorAction = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        & $VenvPython -m pip install --no-cache-dir -r $ReqFile 2>&1 | Tee-Object -FilePath $LogFile -Append
+        $pipExit = $LASTEXITCODE
+        $ErrorActionPreference = $oldErrorAction
+
+        if ($pipExit -ne 0) { throw "Python 依赖安装失败，退出码：$pipExit" }
 
         Set-Content -Path $StampFile -Value $currentHash -Encoding ASCII
     } else {
@@ -161,9 +172,13 @@ try {
     }
 
     Log "正在执行运行环境自检..."
+    $oldErrorAction = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     & $VenvPython -c "import tkinter, fitz, docx, openai, pandas, openpyxl; print('environment-ok')" 2>&1 | Tee-Object -FilePath $LogFile -Append
-    if ($LASTEXITCODE -ne 0) {
-        throw "运行环境自检失败。可双击“REPAIR_ENV.bat”重建依赖。"
+    $checkExit = $LASTEXITCODE
+    $ErrorActionPreference = $oldErrorAction
+    if ($checkExit -ne 0) {
+        throw "运行环境自检失败。可双击 REPAIR_ENV.bat 重建依赖。"
     }
 
     Log "环境正常，正在启动论文自动综合助手。"
@@ -175,7 +190,7 @@ catch {
     Log ("启动失败：" + $_.Exception.Message)
     Write-Host ""
     Write-Host "启动失败。详细日志：$LogFile" -ForegroundColor Red
-    Write-Host "可以先双击“REPAIR_ENV.bat”重试。"
+    Write-Host "可以先双击 REPAIR_ENV.bat 重试。"
     Read-Host "按 Enter 关闭"
     exit 1
 }

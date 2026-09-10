@@ -414,7 +414,7 @@ def write_report(result, headings):
     lines = []
     lines.append("硬约束检查报告_v3")
     lines.append("=" * 50)
-    lines.append("模式：v1.0.0 大纲驱动写作工作流")
+    lines.append("模式：v1.0.1 大纲驱动写作工作流")
     lines.append("")
     lines.append("一、识别到的写作大纲")
     for h in headings:
@@ -442,7 +442,7 @@ def write_audit_stub(result):
     doc = Document()
     set_doc_style(doc)
     add_heading(doc, "全方位审稿评分报告", 0)
-    add_para(doc, "本报告由论文自动综合助手 v1.0.0 大纲驱动流程生成。")
+    add_para(doc, "本报告由论文自动综合助手 v1.0.1 大纲驱动流程生成。")
     add_para(doc, f"全文统计：{result['total']}")
     add_para(doc, f"参考文献数量：{result['ref_count']}")
     add_para(doc, "后续可接入独立审稿模型，对结构、论证、证据、语言和AI感进行细评。")
